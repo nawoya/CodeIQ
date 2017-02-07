@@ -7,6 +7,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * CodeIQ 3102回答用のコードです。
+ * https://codeiq.jp/challenge/3102
+
+ * @author horinaoya
+ *
+ */
 class ComboCounter {
 
 	// 値をスキップできる最大数
@@ -51,21 +58,22 @@ class ComboCounter {
 		try (Scanner cin = new Scanner(System.in)) {
 			String line;
 			int numberOfline = 0;
-			int max = 0;
+			int num = 0;
 
 			for (; cin.hasNext();) {
 				line = cin.nextLine();
 
 				// 正の整数値が入力された場合
 				if (++numberOfline == LINE_OF_MAX) {
-					max = Integer.parseInt(line);
+					num = Integer.parseInt(line);
+					debug("num = " + num);
 				}
 				// コンボ対象の数字が入力された場合
 				else {
 					List<Integer> integerList = stringToIntList(line);
 
 					for (int i = 0; i < integerList.size() - 1; i++) {
-						list.add(countComboFromList(integerList.subList(i, integerList.size()), max));
+						list.add(countComboFromList(integerList.subList(i, integerList.size())));
 					}
 				}
 
@@ -99,9 +107,9 @@ class ComboCounter {
 	 *            整数の最大値
 	 * @return コンボが成立したIntegerのリスト
 	 */
-	private List<Integer> countComboFromList(List<Integer> list, int max) {
+	private List<Integer> countComboFromList(List<Integer> list) {
 
-		debug("Input list = " + list + ", max = " + max);
+		debug("Input list = " + list);
 
 		List<Integer> returnList = new ArrayList<Integer>();
 		Integer first = list.get(0);
@@ -117,15 +125,14 @@ class ComboCounter {
 
 			List<Integer> subList = list.subList(i, Integer.min(list.size(), i + SKIP_MAX + 1));
 			int target = getMinBetweenRange(subList, maxInList);
-			int targetIndex = i + subList.indexOf(target);
+			int targetIndex = i + subList.lastIndexOf(target);
 
 			debug("target =" + target + ", targetIndex =  " + list.indexOf(target) + ", max = " + maxInList
 					+ ",maxIndex = " + maxIndex + ", list.get(i) = " + list.get(i) + ", returnList = " + returnList);
 
 			// 最大値を超える場合、又は、スキップ可能数を超えた場合はスキップ
-			if ((target > max) || (targetIndex > maxIndex + SKIP_MAX + 1)) {
-				debug("skiped...[target=" + target + ",max=" + max + ",targetIndex=" + targetIndex + ", maxIndex="
-						+ maxIndex);
+			if (targetIndex > maxIndex + SKIP_MAX + 1) {
+				debug("skiped...[targetIndex=" + targetIndex + ", maxIndex=" + maxIndex+"]");
 				continue;
 			}
 
@@ -149,15 +156,17 @@ class ComboCounter {
 	}
 
 	/**
-	 * listのIntegerのうち、max未満、かつ、最小のIntegerを返します。
+	 * listのIntegerのうち、maxより小さい、かつ、最小のIntegerを返します。
 	 *
-	 * @param list 対象のリスト
-	 * @param max 整数の最大値
+	 * @param list
+	 *            対象のリスト
+	 * @param max
+	 *            整数の最大値
 	 * @return max未満、かつ、最小のInteger
 	 */
 	private int getMinBetweenRange(List<Integer> list, int max) {
-		debug("list = " + list.toString() + ", max = " + max);
-		return list.stream().filter(i -> i > max).min(Comparator.naturalOrder()).orElse(-1);
+		debug("list = " + list.toString());
+		return list.stream().filter(i->i>max).min(Comparator.naturalOrder()).orElse(-1);
 	}
 
 	/**
